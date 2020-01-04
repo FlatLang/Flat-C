@@ -42,6 +42,11 @@ public abstract class FileDeclarationWriter extends NodeWriter
 	{
 		Package pkg = node().getPackage();
 		ClassDeclaration clazz = node().getClassDeclaration();
+
+		if (clazz == null) {
+			node().getController().error("No class found in file " + node().file.getAbsolutePath());
+			return null;
+		}
 		
 		return (getWriter(pkg).generateHeaderLocation() + "/" + getWriter(clazz).generateSourceName()).replace(" ", "\\ ");
 	}

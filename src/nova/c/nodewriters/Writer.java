@@ -35,17 +35,17 @@ public class Writer
 				}
 			};
 		}
-		else if (node instanceof ClosureVariableAssignment)
-		{
-			return new ClosureVariableAssignmentWriter()
-			{
-				@Override
-				public ClosureVariableAssignment node()
-				{
-					return (ClosureVariableAssignment)node;
-				}
-			};
-		}
+//		else if (node instanceof ClosureVariableAssignment)
+//		{
+//			return new ClosureVariableAssignmentWriter()
+//			{
+//				@Override
+//				public ClosureVariableAssignment node()
+//				{
+//					return (ClosureVariableAssignment)node;
+//				}
+//			};
+//		}
 		else if (node instanceof Cast)
 		{
 			return new CastWriter()

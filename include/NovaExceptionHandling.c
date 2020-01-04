@@ -203,7 +203,7 @@ LONG WINAPI nova_exception_handler(EXCEPTION_POINTERS * ExceptionInfo)
   {
     case EXCEPTION_ACCESS_VIOLATION:
       exception = (nova_exception_Nova_Exception*)nova_exception_Nova_NullAccessException_Nova_construct(0, 0);
-      exception->nova_exception_Nova_Exception_Nova_stackTrace = nova_exception_Nova_StackTrace_1_Nova_construct(0, ExceptionInfo->ContextRecord);
+      exception->nova_exception_Nova_Exception_Nova_stackTrace = nova_exception_Nova_StackTrace_0_Nova_construct(0, ExceptionInfo->ContextRecord);
       THROW(exception, 0);
       fputs("Error: EXCEPTION_ACCESS_VIOLATION\n", stderr);
       break;
