@@ -135,7 +135,7 @@ CORD_API CORD CORD_balance(CORD x);
 
 /* The following traverse a cord by applying a function to each         */
 /* character.  This is occasionally appropriate, especially where       */
-/* speed is crucial.  But, since C doesn't have nested functions,       */
+/* speed is crucial.  But, since C doesn't have tested functions,       */
 /* clients of this sort of traversal are clumsy to write.  Consider     */
 /* the functions that operate on cord positions instead.                */
 

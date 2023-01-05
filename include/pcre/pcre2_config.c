@@ -148,7 +148,7 @@ switch (what)
   break;
 
   case PCRE2_CONFIG_PARENSLIMIT:
-  *((uint32_t *)where) = PARENS_NEST_LIMIT;
+  *((uint32_t *)where) = PARENS_TEST_LIMIT;
   break;
 
   case PCRE2_CONFIG_RECURSIONLIMIT:

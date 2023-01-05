@@ -200,8 +200,8 @@ for (;;)
     case OP_ASSERT_ACCEPT:
     return -1;
 
-    /* Reached end of a branch; if it's a ket it is the end of a nested
-    call. If it's ALT it is an alternation in a nested call. If it is END it's
+    /* Reached end of a branch; if it's a ket it is the end of a tested
+    call. If it's ALT it is an alternation in a tested call. If it is END it's
     the end of the outer call. All can be handled by the same code. If an
     ACCEPT was previously encountered, use the length that was in force at that
     time, and pass back the shortest ACCEPT length. */
@@ -1041,7 +1041,7 @@ do
       continue with the next alternative, but we have to arrange that the final
       result from subpattern is SSB_CONTINUE rather than SSB_DONE. For KET,
       return SSB_CONTINUE: if this is the top level, that indicates failure,
-      but after a nested subpattern, it causes scanning to continue. */
+      but after a tested subpattern, it causes scanning to continue. */
 
       case OP_ALT:
       yield = SSB_CONTINUE;

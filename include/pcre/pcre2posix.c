@@ -129,7 +129,7 @@ static const int eint1[] = {
   REG_INVARG,  /* pattern passed as NULL */
   REG_INVARG,  /* unknown compile-time option bit(s) */
   REG_EPAREN,  /* missing ) after (?# comment */
-  REG_ESIZE,   /* parentheses nested too deeply */
+  REG_ESIZE,   /* parentheses tested too deeply */
   /* 20 */
   REG_ESIZE,   /* regular expression too large */
   REG_ESPACE,  /* failed to get memory */

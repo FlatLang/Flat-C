@@ -504,7 +504,7 @@ do
 
   /* Any return code other than NOMATCH is an error. Otherwise, advance to the
   next alternative or to the end of the recursing subpattern. If there were
-  nested recursions, mb->recursive might be changed, so reset it before
+  tested recursions, mb->recursive might be changed, so reset it before
   looping. */
 
   if (rrc != MATCH_NOMATCH) return rrc;
@@ -1461,7 +1461,7 @@ for (;;)
     doesn't exist, in which case we can just plough on. Note that, for
     compatibility with Perl, the | in a conditional group is NOT treated as
     creating two alternatives. If a THEN is encountered in the branch, it
-    propagates out to the enclosing alternative (unless nested in a deeper set
+    propagates out to the enclosing alternative (unless tested in a deeper set
     of alternatives, of course). */
 
     if (condition || ecode[-(1+LINK_SIZE)] == OP_ALT)
@@ -6920,7 +6920,7 @@ for(;;)
       subject for the match to succeed. If the first code unit is set, req_cu
       must be later in the subject; otherwise the test starts at the match
       point. This optimization can save a huge amount of backtracking in
-      patterns with nested unlimited repeats that aren't going to match.
+      patterns with tested unlimited repeats that aren't going to match.
       Writing separate code for cased/caseless versions makes it go faster, as
       does using an autoincrement and backing off on a match.
 

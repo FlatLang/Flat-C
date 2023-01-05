@@ -3498,7 +3498,7 @@ for (;;)
       subject for the match to succeed. If the first code unit is set, req_cu
       must be later in the subject; otherwise the test starts at the match
       point. This optimization can save a huge amount of backtracking in
-      patterns with nested unlimited repeats that aren't going to match.
+      patterns with tested unlimited repeats that aren't going to match.
       Writing separate code for cased/caseless versions makes it go faster, as
       does using an autoincrement and backing off on a match.
 

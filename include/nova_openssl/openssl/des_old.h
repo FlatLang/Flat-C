@@ -21,7 +21,7 @@
  * prefered compatibility mode.  However, after much consideration
  * (and more or less violent discussions with external parties), it
  * was concluded that OpenSSL should be compatible with earlier versions
- * of itself before anything else.  Also, in all honesty, libdes is
+ * of itself before anything else.  Also, in all hotesty, libdes is
  * an old beast that shouldn't really be used any more.
  *
  * Please consider starting to use the DES_ functions rather than the
@@ -42,7 +42,7 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
+ *    notice, this list of conditions and the following disclaimer.
  *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in
@@ -219,7 +219,7 @@ typedef struct _ossl_old_des_ks_struct
 	DES_cfb64_encrypt((i),(o),(l),&(ks),(iv),(n),(e))
 #define des_ofb64_encrypt(i,o,l,ks,iv,n)\
 	DES_ofb64_encrypt((i),(o),(l),&(ks),(iv),(n))
-		
+
 
 #define des_ecb2_encrypt(i,o,k1,k2,e) \
 	des_ecb3_encrypt((i),(o),(k1),(k2),(k1),(e))
@@ -314,7 +314,7 @@ typedef struct _ossl_old_des_ks_struct
 	_ossl_old_des_cfb64_encrypt((i),(o),(l),(ks),(iv),(n),(e))
 #define des_ofb64_encrypt(i,o,l,ks,iv,n)\
 	_ossl_old_des_ofb64_encrypt((i),(o),(l),(ks),(iv),(n))
-		
+
 
 #define des_ecb2_encrypt(i,o,k1,k2,e) \
 	des_ecb3_encrypt((i),(o),(k1),(k2),(k1),(e))
@@ -355,8 +355,8 @@ void _ossl_old_des_encrypt3(DES_LONG *data, _ossl_old_des_key_schedule ks1,
 	_ossl_old_des_key_schedule ks2, _ossl_old_des_key_schedule ks3);
 void _ossl_old_des_decrypt3(DES_LONG *data, _ossl_old_des_key_schedule ks1,
 	_ossl_old_des_key_schedule ks2, _ossl_old_des_key_schedule ks3);
-void _ossl_old_des_ede3_cbc_encrypt(_ossl_old_des_cblock *input, _ossl_old_des_cblock *output, 
-	long length, _ossl_old_des_key_schedule ks1, _ossl_old_des_key_schedule ks2, 
+void _ossl_old_des_ede3_cbc_encrypt(_ossl_old_des_cblock *input, _ossl_old_des_cblock *output,
+	long length, _ossl_old_des_key_schedule ks1, _ossl_old_des_key_schedule ks2,
 	_ossl_old_des_key_schedule ks3, _ossl_old_des_cblock *ivec, int enc);
 void _ossl_old_des_ede3_cfb64_encrypt(unsigned char *in, unsigned char *out,
 	long length, _ossl_old_des_key_schedule ks1, _ossl_old_des_key_schedule ks2,

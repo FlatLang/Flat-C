@@ -60,7 +60,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* In extended mode, we recognize ${name:+set text:unset text} and similar
 constructions. This requires the identification of unescaped : and }
-characters. This function scans for such. It must deal with nested ${
+characters. This function scans for such. It must deal with tested ${
 constructions. The pointer to the text is updated, either to the required end
 character, or to where an error was detected.
 
@@ -79,7 +79,7 @@ find_text_end(const pcre2_code *code, PCRE2_SPTR *ptrptr, PCRE2_SPTR ptrend,
   BOOL last)
 {
 int rc = 0;
-uint32_t nestlevel = 0;
+uint32_t testlevel = 0;
 BOOL literal = FALSE;
 PCRE2_SPTR ptr = *ptrptr;
 
@@ -96,17 +96,17 @@ for (; ptr < ptrend; ptr++)
 
   else if (*ptr == CHAR_RIGHT_CURLY_BRACKET)
     {
-    if (nestlevel == 0) goto EXIT;
-    nestlevel--;
+    if (testlevel == 0) goto EXIT;
+    testlevel--;
     }
 
-  else if (*ptr == CHAR_COLON && !last && nestlevel == 0) goto EXIT;
+  else if (*ptr == CHAR_COLON && !last && testlevel == 0) goto EXIT;
 
   else if (*ptr == CHAR_DOLLAR_SIGN)
     {
     if (ptr < ptrend - 1 && ptr[1] == CHAR_LEFT_CURLY_BRACKET)
       {
-      nestlevel++;
+      testlevel++;
       ptr += 1;
       }
     }
@@ -379,7 +379,7 @@ do
 
   /* Process the replacement string. Literal mode is set by \Q, but only in
   extended mode when backslashes are being interpreted. In extended mode we
-  must handle nested substrings that are to be reprocessed. */
+  must handle tested substrings that are to be reprocessed. */
 
   ptr = replacement;
   for (;;)
@@ -387,7 +387,7 @@ do
     uint32_t ch;
     unsigned int chlen;
 
-    /* If at the end of a nested substring, pop the stack. */
+    /* If at the end of a tested substring, pop the stack. */
 
     if (ptr >= repend)
       {

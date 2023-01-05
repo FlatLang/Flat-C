@@ -98,7 +98,7 @@ static BOOL
 
 /* This value specifies the size of stack workspace, which is used in different
 ways in the different pattern scans. The group-identifying pre-scan uses it to
-handle nesting, and needs it to be 16-bit aligned.
+handle testing, and needs it to be 16-bit aligned.
 
 During the first compiling phase, when determining how much memory is required,
 the regex is partly compiled into this space, but the compiled parts are
@@ -956,8 +956,8 @@ for (;;)
     cc += 1 + LINK_SIZE;
     break;
 
-    /* Reached end of a branch; if it's a ket it is the end of a nested call.
-    If it's ALT it is an alternation in a nested call. An ACCEPT is effectively
+    /* Reached end of a branch; if it's a ket it is the end of a tested call.
+    If it's ALT it is an alternation in a tested call. An ACCEPT is effectively
     an ALT. If it is END it's the end of the outer call. All can be handled by
     the same code. Note that we must not include the OP_KETRxxx opcodes here,
     because they all imply an unlimited repeat. */
@@ -1486,7 +1486,7 @@ for (code = first_significant_code(code + PRIV(OP_lengths)[*code], TRUE);
     continue;
     }
 
-  /* A nested group that is already marked as "could be empty" can just be
+  /* A tested group that is already marked as "could be empty" can just be
   skipped. */
 
   if (c == OP_SBRA  || c == OP_SBRAPOS ||
@@ -1799,11 +1799,11 @@ not relevant, but the options argument is the final value of the compiled
 pattern's options.
 
 There is one "trick" case: when a sequence such as [[:>:]] or \s in UCP mode is
-processed, it is replaced by a nested alternative sequence. If this contains a
+processed, it is replaced by a tested alternative sequence. If this contains a
 backslash (which is usually does), ptrend does not point to its end - it still
 points to the end of the whole pattern. However, we can detect this case
-because cb->nestptr[0] will be non-NULL. The nested sequences are all zero-
-terminated and there are only ever two levels of nesting.
+because cb->testptr[0] will be non-NULL. The tested sequences are all zero-
+terminated and there are only ever two levels of testing.
 
 Arguments:
   ptrptr         points to the input position pointer
@@ -1830,9 +1830,9 @@ register uint32_t c, cc;
 int escape = 0;
 int i;
 
-/* Find the end of a nested insert. */
+/* Find the end of a tested insert. */
 
-if (cb != NULL && cb->nestptr[0] != NULL)
+if (cb != NULL && cb->testptr[0] != NULL)
   ptrend = ptr + PRIV(strlen)(ptr);
 
 /* If backslash is at the end of the string, it's an error. */
@@ -2632,11 +2632,11 @@ not recognize "l\ower". This is a lesser evil than not diagnosing bad classes
 when Perl does, I think.
 
 A user pointed out that PCRE was rejecting [:a[:digit:]] whereas Perl was not.
-It seems that the appearance of a nested POSIX class supersedes an apparent
+It seems that the appearance of a tested POSIX class supersedes an apparent
 external class. For example, [:a[:digit:]b:] matches "a", "b", ":", or
 a digit. This is handled by returning FALSE if the start of a new group with
 the same terminator is encountered, since the next closing sequence must close
-the nested group, not the outer one.
+the tested group, not the outer one.
 
 In Perl, unescaped square brackets may also appear as part of class names. For
 example, [:a[:abc]b:] gives unknown POSIX class "[:abc]b:]". However, for
@@ -3203,12 +3203,12 @@ Arguments:
 Returns:   zero on success or a non-zero error code, with pointer updated
 */
 
-typedef struct nest_save {
-  uint16_t  nest_depth;
+typedef struct test_save {
+  uint16_t  test_depth;
   uint16_t  reset_group;
   uint16_t  max_group;
   uint16_t  flags;
-} nest_save;
+} test_save;
 
 #define NSF_RESET    0x0001u
 #define NSF_EXTENDED 0x0002u
@@ -3221,7 +3221,7 @@ uint32_t c;
 uint32_t delimiter;
 uint32_t set, unset, *optset;
 uint32_t skiptoket = 0;
-uint16_t nest_depth = 0;
+uint16_t test_depth = 0;
 int errorcode = 0;
 int escape;
 int namelen;
@@ -3234,15 +3234,15 @@ PCRE2_SPTR name;
 PCRE2_SPTR start;
 PCRE2_SPTR ptr = *ptrptr;
 named_group *ng;
-nest_save *top_nest = NULL;
-nest_save *end_nests = (nest_save *)(cb->start_workspace + cb->workspace_size);
+test_save *top_test = NULL;
+test_save *end_tests = (test_save *)(cb->start_workspace + cb->workspace_size);
 
-/* The size of the nest_save structure might not be a factor of the size of the
-workspace. Therefore we must round down end_nests so as to correctly avoid
-creating a nest_save that spans the end of the workspace. */
+/* The size of the test_save structure might not be a factor of the size of the
+workspace. Therefore we must round down end_tests so as to correctly avoid
+creating a test_save that spans the end of the workspace. */
 
-end_nests = (nest_save *)((char *)end_nests -
-  ((cb->workspace_size * sizeof(PCRE2_UCHAR)) % sizeof(nest_save)));
+end_tests = (test_save *)((char *)end_tests -
+  ((cb->workspace_size * sizeof(PCRE2_UCHAR)) % sizeof(test_save)));
 
 /* Now scan the pattern */
 
@@ -3252,7 +3252,7 @@ for (; ptr < cb->end_pattern; ptr++)
 
   /* Parenthesized groups set skiptoket when all following characters up to the
   next closing parenthesis must be ignored. The parenthesis itself must be
-  processed (to end the nested parenthesized item). */
+  processed (to end the tested parenthesized item). */
 
   if (skiptoket != 0)
     {
@@ -3416,7 +3416,7 @@ for (; ptr < cb->end_pattern; ptr++)
     /* This is the real work of this function - handling parentheses. */
 
     case CHAR_LEFT_PARENTHESIS:
-    nest_depth++;
+    test_depth++;
 
     if (ptr[1] != CHAR_QUESTION_MARK)
       {
@@ -3444,7 +3444,7 @@ for (; ptr < cb->end_pattern; ptr++)
           while (ptr < cb->end_pattern && *ptr != CHAR_RIGHT_PARENTHESIS)
             ptr++;
           }
-        nest_depth--;
+        test_depth--;
         }
       }
 
@@ -3464,32 +3464,32 @@ for (; ptr < cb->end_pattern; ptr++)
         }
 
       /* Handle (?| and (?imsxJU: which are the only other valid forms. Both
-      need a new block on the nest stack. */
+      need a new block on the test stack. */
 
-      if (top_nest == NULL) top_nest = (nest_save *)(cb->start_workspace);
-      else if (++top_nest >= end_nests)
+      if (top_test == NULL) top_test = (test_save *)(cb->start_workspace);
+      else if (++top_test >= end_tests)
         {
         errorcode = ERR84;
         goto FAILED;
         }
-      top_nest->nest_depth = nest_depth;
-      top_nest->flags = 0;
-      if ((options & PCRE2_EXTENDED) != 0) top_nest->flags |= NSF_EXTENDED;
-      if ((options & PCRE2_DUPNAMES) != 0) top_nest->flags |= NSF_DUPNAMES;
+      top_test->test_depth = test_depth;
+      top_test->flags = 0;
+      if ((options & PCRE2_EXTENDED) != 0) top_test->flags |= NSF_EXTENDED;
+      if ((options & PCRE2_DUPNAMES) != 0) top_test->flags |= NSF_DUPNAMES;
 
       if (*ptr == CHAR_VERTICAL_LINE)
         {
-        top_nest->reset_group = (uint16_t)cb->bracount;
-        top_nest->max_group = (uint16_t)cb->bracount;
-        top_nest->flags |= NSF_RESET;
+        top_test->reset_group = (uint16_t)cb->bracount;
+        top_test->max_group = (uint16_t)cb->bracount;
+        top_test->flags |= NSF_RESET;
         cb->external_flags |= PCRE2_DUPCAPUSED;
         break;
         }
 
       /* Scan options */
 
-      top_nest->reset_group = 0;
-      top_nest->max_group = 0;
+      top_test->reset_group = 0;
+      top_test->max_group = 0;
 
       set = unset = 0;
       optset = &set;
@@ -3524,17 +3524,17 @@ for (; ptr < cb->end_pattern; ptr++)
 
       options = (options | set) & (~unset);
 
-      /* If the options ended with ')' this is not the start of a nested
+      /* If the options ended with ')' this is not the start of a tested
       group with option changes, so the options change at this level. If the
-      previous level set up a nest block, discard the one we have just created.
+      previous level set up a test block, discard the one we have just created.
       Otherwise adjust it for the previous level. */
 
       if (*ptr == CHAR_RIGHT_PARENTHESIS)
         {
-        nest_depth--;
-        if (top_nest > (nest_save *)(cb->start_workspace) &&
-            (top_nest-1)->nest_depth == nest_depth) top_nest --;
-        else top_nest->nest_depth = nest_depth;
+        test_depth--;
+        if (top_test > (test_save *)(cb->start_workspace) &&
+            (top_test-1)->test_depth == test_depth) top_test --;
+        else top_test->test_depth = test_depth;
         }
       break;
 
@@ -3598,7 +3598,7 @@ for (; ptr < cb->end_pattern; ptr++)
       case CHAR_LEFT_PARENTHESIS:
       if (ptr[3] != CHAR_QUESTION_MARK)   /* Not assertion or callout */
         {
-        nest_depth++;
+        test_depth++;
         ptr += 2;
         break;
         }
@@ -3769,12 +3769,12 @@ for (; ptr < cb->end_pattern; ptr++)
     /* At an alternation, reset the capture count if we are in a (?| group. */
 
     case CHAR_VERTICAL_LINE:
-    if (top_nest != NULL && top_nest->nest_depth == nest_depth &&
-        (top_nest->flags & NSF_RESET) != 0)
+    if (top_test != NULL && top_test->test_depth == test_depth &&
+        (top_test->flags & NSF_RESET) != 0)
       {
-      if (cb->bracount > top_nest->max_group)
-        top_nest->max_group = (uint16_t)cb->bracount;
-      cb->bracount = top_nest->reset_group;
+      if (cb->bracount > top_test->max_group)
+        top_test->max_group = (uint16_t)cb->bracount;
+      cb->bracount = top_test->reset_group;
       }
     break;
 
@@ -3782,29 +3782,29 @@ for (; ptr < cb->end_pattern; ptr++)
     are in a (?| group and/or reset the extended option. */
 
     case CHAR_RIGHT_PARENTHESIS:
-    if (top_nest != NULL && top_nest->nest_depth == nest_depth)
+    if (top_test != NULL && top_test->test_depth == test_depth)
       {
-      if ((top_nest->flags & NSF_RESET) != 0 &&
-          top_nest->max_group > cb->bracount)
-        cb->bracount = top_nest->max_group;
-      if ((top_nest->flags & NSF_EXTENDED) != 0) options |= PCRE2_EXTENDED;
+      if ((top_test->flags & NSF_RESET) != 0 &&
+          top_test->max_group > cb->bracount)
+        cb->bracount = top_test->max_group;
+      if ((top_test->flags & NSF_EXTENDED) != 0) options |= PCRE2_EXTENDED;
         else options &= ~PCRE2_EXTENDED;
-      if ((top_nest->flags & NSF_DUPNAMES) != 0) options |= PCRE2_DUPNAMES;
+      if ((top_test->flags & NSF_DUPNAMES) != 0) options |= PCRE2_DUPNAMES;
         else options &= ~PCRE2_DUPNAMES;
-      if (top_nest == (nest_save *)(cb->start_workspace)) top_nest = NULL;
-        else top_nest--;
+      if (top_test == (test_save *)(cb->start_workspace)) top_test = NULL;
+        else top_test--;
       }
-    if (nest_depth == 0)    /* Unmatched closing parenthesis */
+    if (test_depth == 0)    /* Unmatched closing parenthesis */
       {
       errorcode = ERR22;
       goto FAILED;
       }
-    nest_depth--;
+    test_depth--;
     break;
     }
   }
 
-if (nest_depth == 0)
+if (test_depth == 0)
   {
   cb->final_bracount = cb->bracount;
   return 0;
@@ -3842,7 +3842,7 @@ Arguments:
   reqcuptr          place to put the last required code unit
   reqcuflagsptr     place to put the last required code unit flags, or a negative number
   bcptr             points to current branch chain
-  cond_depth        conditional nesting depth
+  cond_depth        conditional testing depth
   cb                contains pointers to tables etc.
   lengthptr         NULL during the real compile phase
                     points to length accumulator during pre-compile phase
@@ -3972,15 +3972,15 @@ for (;; ptr++)
 
   c = *ptr;
 
-  /* If we are at the end of a nested substitution, revert to the outer level
-  string. Nesting only happens one or two levels deep, and the inserted string
+  /* If we are at the end of a tested substitution, revert to the outer level
+  string. Testing only happens one or two levels deep, and the inserted string
   is always zero terminated. */
 
-  if (c == CHAR_NULL && cb->nestptr[0] != NULL)
+  if (c == CHAR_NULL && cb->testptr[0] != NULL)
     {
-    ptr = cb->nestptr[0];
-    cb->nestptr[0] = cb->nestptr[1];
-    cb->nestptr[1] = NULL;
+    ptr = cb->testptr[0];
+    cb->testptr[0] = cb->testptr[1];
+    cb->testptr[1] = NULL;
     c = *ptr;
     }
 
@@ -4137,7 +4137,7 @@ for (;; ptr++)
   required, except when the next thing is a quantifier or when processing a
   property substitution string for \w etc in UCP mode. */
 
-  if (!is_quantifier && cb->nestptr[0] == NULL)
+  if (!is_quantifier && cb->testptr[0] == NULL)
     {
     if (previous_callout != NULL && after_manual_callout-- <= 0)
       {
@@ -4240,21 +4240,21 @@ for (;; ptr++)
     used for "start of word" and "end of word". As these are otherwise illegal
     sequences, we don't break anything by recognizing them. They are replaced
     by \b(?=\w) and \b(?<=\w) respectively. This can only happen at the top
-    nesting level, as no other inserted sequences will contains these oddities.
+    testing level, as no other inserted sequences will contains these oddities.
     Sequences like [a[:<:]] are erroneous and are handled by the normal code
     below. */
 
     case CHAR_LEFT_SQUARE_BRACKET:
     if (PRIV(strncmp_c8)(ptr+1, STRING_WEIRD_STARTWORD, 6) == 0)
       {
-      cb->nestptr[0] = ptr + 7;
+      cb->testptr[0] = ptr + 7;
       ptr = sub_start_of_word;
       goto REDO_LOOP;
       }
 
     if (PRIV(strncmp_c8)(ptr+1, STRING_WEIRD_ENDWORD, 6) == 0)
       {
-      cb->nestptr[0] = ptr + 7;
+      cb->testptr[0] = ptr + 7;
       ptr = sub_end_of_word;
       goto REDO_LOOP;
       }
@@ -4440,13 +4440,13 @@ for (;; ptr++)
           int pc = posix_class + ((local_negate)? POSIX_SUBSIZE/2 : 0);
 
           /* The posix_substitutes table specifies which POSIX classes can be
-          converted to \p or \P items. This can only happen at top nestling
+          converted to \p or \P items. This can only happen at top testling
           level, as there will never be a POSIX class in a string that is
           substituted for something else. */
 
           if (posix_substitutes[pc] != NULL)
             {
-            cb->nestptr[0] = tempptr + 1;
+            cb->testptr[0] = tempptr + 1;
             ptr = posix_substitutes[pc] - 1;
             goto CONTINUE_CLASS;
             }
@@ -4593,9 +4593,9 @@ for (;; ptr++)
             case ESC_wu:     /* escape sequence with an appropriate \p */
             case ESC_WU:     /* or \P to test Unicode properties instead */
             case ESC_su:     /* of the default ASCII testing. This might be */
-            case ESC_SU:     /* a 2nd-level nesting for [[:<:]] or [[:>:]]. */
-            cb->nestptr[1] = cb->nestptr[0];
-            cb->nestptr[0] = ptr;
+            case ESC_SU:     /* a 2nd-level testing for [[:<:]] or [[:>:]]. */
+            cb->testptr[1] = cb->testptr[0];
+            cb->testptr[0] = ptr;
             ptr = substitutes[escape - ESC_DU] - 1;  /* Just before substitute */
             class_has_8bitchar--;                /* Undo! */
             break;
@@ -4936,16 +4936,16 @@ for (;; ptr++)
 
       /* Continue to the next character in the class. Closing square bracket
       not within \Q..\E ends the class. A NULL character terminates a
-      nested substitution string, but may be a data character in the main
+      tested substitution string, but may be a data character in the main
       pattern (tested at the start of this loop). */
 
       CONTINUE_CLASS:
       c = *(++ptr);
-      if (c == CHAR_NULL && cb->nestptr[0] != NULL)
+      if (c == CHAR_NULL && cb->testptr[0] != NULL)
         {
-        ptr = cb->nestptr[0];
-        cb->nestptr[0] = cb->nestptr[1];
-        cb->nestptr[1] = NULL;
+        ptr = cb->testptr[0];
+        cb->testptr[0] = cb->testptr[1];
+        cb->testptr[1] = NULL;
         c = *(++ptr);
         }
 
@@ -5480,7 +5480,7 @@ for (;; ptr++)
           }
 
         /* If the maximum is greater than 1 and limited, we have to replicate
-        in a nested fashion, sticking OP_BRAZERO before each set of brackets.
+        in a tested fashion, sticking OP_BRAZERO before each set of brackets.
         The first one has to be handled carefully because it's the original
         copy, which has to be moved up. The remainder can be handled by code
         that is common with the non-zero minimum case below. We have to
@@ -5554,7 +5554,7 @@ for (;; ptr++)
         }
 
       /* This code is common to both the zero and non-zero minimum cases. If
-      the maximum is limited, it replicates the group in a nested fashion,
+      the maximum is limited, it replicates the group in a tested fashion,
       remembering the bracket starts on a stack. In the case of a zero minimum,
       the first one was set up above. In all cases the repeat_max now specifies
       the number of additional copies needed. Again, we must remember to
@@ -5565,14 +5565,14 @@ for (;; ptr++)
         /* In the pre-compile phase, we don't actually do the replication. We
         just adjust the length as if we had. For each repetition we must add 1
         to the length for BRAZERO and for all but the last repetition we must
-        add 2 + 2*LINKSIZE to allow for the nesting that occurs. Do some
+        add 2 + 2*LINKSIZE to allow for the testing that occurs. Do some
         paranoid checks to avoid integer overflow. The INT64_OR_DOUBLE type is
         a 64-bit integer type when available, otherwise double. */
 
         if (lengthptr != NULL && repeat_max > 0)
           {
           size_t delta = repeat_max*(length_prevgroup + 1 + 2 + 2*LINK_SIZE) -
-                      2 - 2*LINK_SIZE;   /* Last one doesn't nest */
+                      2 - 2*LINK_SIZE;   /* Last one doesn't test */
           if ((INT64_OR_DOUBLE)repeat_max *
                 (INT64_OR_DOUBLE)(length_prevgroup + 1 + 2 + 2*LINK_SIZE)
                   > (INT64_OR_DOUBLE)INT_MAX ||
@@ -5590,7 +5590,7 @@ for (;; ptr++)
           {
           *code++ = OP_BRAZERO + repeat_type;
 
-          /* All but the final copy start a new nesting, maintaining the
+          /* All but the final copy start a new testing, maintaining the
           chain of brackets outstanding. */
 
           if (i != 0)
@@ -5865,7 +5865,7 @@ for (;; ptr++)
 
 
     /* ===================================================================*/
-    /* Start of nested parenthesized sub-expression, or lookahead or lookbehind
+    /* Start of tested parenthesized sub-expression, or lookahead or lookbehind
     or option setting or condition or all the other extended parenthesis forms.
     We must save the current high-water-mark for the forward reference list so
     that we know where they start for this group. However, because the list may
@@ -5958,7 +5958,7 @@ for (;; ptr++)
             cb->had_accept = TRUE;
 
             /* In the first pass, just accumulate the length required;
-            otherwise hitting (*ACCEPT) inside many nested parentheses can
+            otherwise hitting (*ACCEPT) inside many tested parentheses can
             cause workspace overflow. */
 
             for (oc = cb->open_caps; oc != NULL; oc = oc->next)
@@ -6950,7 +6950,7 @@ for (;; ptr++)
 
         newoptions = (options | set) & (~unset);
 
-        /* If the options ended with ')' this is not the start of a nested
+        /* If the options ended with ')' this is not the start of a tested
         group with option changes, so the options change at this level. They
         must also be passed back for use in subsequent branches. Reset the
         greedy defaults and the case value for firstcu and reqcu. */
@@ -6965,7 +6965,7 @@ for (;; ptr++)
           continue;              /* It is complete */
           }
 
-        /* If the options ended with ':' we are heading into a nested group
+        /* If the options ended with ':' we are heading into a tested group
         with possible change of options. Such groups are non-capturing and are
         not assertions of any kind. All we need to do is skip over the ':';
         the newoptions value is handled below. */
@@ -6994,10 +6994,10 @@ for (;; ptr++)
       skipunits = IMM2_SIZE;
       }
 
-    /* Process nested bracketed regex. First check for parentheses nested too
+    /* Process tested bracketed regex. First check for parentheses tested too
     deeply. */
 
-    if ((cb->parens_depth += 1) > (int)(cb->cx->parens_nest_limit))
+    if ((cb->parens_depth += 1) > (int)(cb->cx->parens_test_limit))
       {
       *errorcodeptr = ERR19;
       goto FAILED;
@@ -7414,8 +7414,8 @@ for (;; ptr++)
 #ifdef SUPPORT_UNICODE
         if (escape >= ESC_DU && escape <= ESC_wu)
           {
-          cb->nestptr[1] = cb->nestptr[0];         /* Back up if at 2nd level */
-          cb->nestptr[0] = ptr + 1;                /* Where to resume */
+          cb->testptr[1] = cb->testptr[0];         /* Back up if at 2nd level */
+          cb->testptr[0] = ptr + 1;                /* Where to resume */
           ptr = substitutes[escape - ESC_DU] - 1;  /* Just before substitute */
           }
         else
@@ -7573,7 +7573,7 @@ Arguments:
   lookbehind        TRUE if this is a lookbehind assertion
   reset_bracount    TRUE to reset the count for each branch
   skipunits         skip this many code units at start (for brackets and OP_COND)
-  cond_depth        depth of nesting for conditional subpatterns
+  cond_depth        depth of testing for conditional subpatterns
   firstcuptr        place to put the first required code unit
   firstcuflagsptr   place to put the first code unit flags, or a negative number
   reqcuptr          place to put the last required code unit
@@ -8432,7 +8432,7 @@ cb.bracount = cb.final_bracount = 0;
 cb.cx = ccontext;
 cb.dupnames = FALSE;
 cb.end_pattern = pattern + patlen;
-cb.nestptr[0] = cb.nestptr[1] = NULL;
+cb.testptr[0] = cb.testptr[1] = NULL;
 cb.external_flags = 0;
 cb.external_options = options;
 cb.groupinfo = c32workspace;

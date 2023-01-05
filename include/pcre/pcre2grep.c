@@ -474,7 +474,7 @@ if (resource_error)
   fprintf(stderr, "pcre2grep: Error %d, %d or %d means that a resource limit "
     "was exceeded.\n", PCRE2_ERROR_JIT_STACKLIMIT, PCRE2_ERROR_MATCHLIMIT,
     PCRE2_ERROR_RECURSIONLIMIT);
-  fprintf(stderr, "pcre2grep: Check your regex for nested unlimited loops.\n");
+  fprintf(stderr, "pcre2grep: Check your regex for tested unlimited loops.\n");
   }
 exit(rc);
 }

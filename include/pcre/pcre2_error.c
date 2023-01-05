@@ -85,7 +85,7 @@ static const unsigned char compile_error_texts[] =
   "pattern passed as NULL\0"
   "unrecognised compile-time option bit(s)\0"
   "missing ) after (?# comment\0"
-  "parentheses are too deeply nested\0"
+  "parentheses are too deeply tested\0"
   /* 20 */
   "regular expression is too large\0"
   "failed to allocate heap memory\0"
@@ -102,7 +102,7 @@ static const unsigned char compile_error_texts[] =
   "unknown POSIX class name\0"
   "internal error in pcre2_study(): should not occur\0"
   "this version of PCRE2 does not have Unicode support\0"
-  "parentheses are too deeply nested (stack check)\0"
+  "parentheses are too deeply tested (stack check)\0"
   "character code point value in \\x{} or \\o{} is too large\0"
   /* 35 */
   "invalid condition (?(0)\0"
@@ -167,7 +167,7 @@ static const unsigned char compile_error_texts[] =
   "missing terminating delimiter for callout with string argument\0"
   "unrecognized string delimiter follows (?C\0"
   "using \\C is disabled by the application\0"
-  "(?| and/or (?J: or (?x: parentheses are too deeply nested\0"
+  "(?| and/or (?J: or (?x: parentheses are too deeply tested\0"
   /* 85 */
   "using \\C is disabled in this PCRE2 library\0"
   "regular expression is too complicated\0"
@@ -240,7 +240,7 @@ static const unsigned char match_error_texts[] =
   /* 50 */
   "non-unique substring name\0"
   "NULL argument passed\0"
-  "nested recursion at the same subject position\0"
+  "tested recursion at the same subject position\0"
   "recursion limit exceeded\0"
   "requested value is not available\0"
   /* 55 */

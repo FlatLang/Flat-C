@@ -412,7 +412,7 @@ PCRE2_EXP_DECL int       pcre2_set_character_tables(pcre2_compile_context *, \
 PCRE2_EXP_DECL int       pcre2_set_max_pattern_length(pcre2_compile_context *, \
                            PCRE2_SIZE); \
 PCRE2_EXP_DECL int       pcre2_set_newline(pcre2_compile_context *, uint32_t); \
-PCRE2_EXP_DECL int       pcre2_set_parens_nest_limit(pcre2_compile_context *, \
+PCRE2_EXP_DECL int       pcre2_set_parens_test_limit(pcre2_compile_context *, \
                            uint32_t); \
 PCRE2_EXP_DECL int       pcre2_set_compile_recursion_guard(\
                            pcre2_compile_context *, int (*)(uint32_t, void *), \
@@ -636,7 +636,7 @@ pcre2_compile are called by application code. */
 #define pcre2_set_match_limit                 PCRE2_SUFFIX(pcre2_set_match_limit_)
 #define pcre2_set_max_pattern_length          PCRE2_SUFFIX(pcre2_set_max_pattern_length_)
 #define pcre2_set_newline                     PCRE2_SUFFIX(pcre2_set_newline_)
-#define pcre2_set_parens_nest_limit           PCRE2_SUFFIX(pcre2_set_parens_nest_limit_)
+#define pcre2_set_parens_test_limit           PCRE2_SUFFIX(pcre2_set_parens_test_limit_)
 #define pcre2_set_offset_limit                PCRE2_SUFFIX(pcre2_set_offset_limit_)
 #define pcre2_set_recursion_limit             PCRE2_SUFFIX(pcre2_set_recursion_limit_)
 #define pcre2_set_recursion_memory_management PCRE2_SUFFIX(pcre2_set_recursion_memory_management_)

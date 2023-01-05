@@ -242,7 +242,7 @@ GC_API
 # endif
   int GC_dont_gc;       /* != 0 ==> Don't collect.  In versions 6.2a1+, */
                         /* this overrides explicit GC_gcollect() calls. */
-                        /* Used as a counter, so that nested enabling   */
+                        /* Used as a counter, so that tested enabling   */
                         /* and disabling work correctly.  Should        */
                         /* normally be updated with GC_enable() and     */
                         /* GC_disable() calls.  Direct assignment to    */
@@ -750,7 +750,7 @@ GC_API void GC_CALL GC_disable(void);
 GC_API int GC_CALL GC_is_disabled(void);
 
 /* Try to re-enable garbage collection.  GC_disable() and GC_enable()   */
-/* calls nest.  Garbage collection is enabled if the number of calls to */
+/* calls test.  Garbage collection is enabled if the number of calls to */
 /* both functions is equal.                                             */
 GC_API void GC_CALL GC_enable(void);
 

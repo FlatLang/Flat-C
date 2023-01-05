@@ -123,7 +123,7 @@ GC_API void * GC_greatest_plausible_heap_addr;
                         /* Hence usually includes not-yet-mapped        */
                         /* memory.                                      */
 
-/* Handle nested references in a custom mark procedure.                 */
+/* Handle tested references in a custom mark procedure.                 */
 /* Check if obj is a valid object. If so, ensure that it is marked.     */
 /* If it was not previously marked, push its contents onto the mark     */
 /* stack for future scanning.  The object will then be scanned using    */

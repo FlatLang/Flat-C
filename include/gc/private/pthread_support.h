@@ -78,8 +78,8 @@ typedef struct GC_Thread_Rep {
                                 /* it.                                  */
 
     unsigned short finalizer_skipped;
-    unsigned char finalizer_nested;
-                                /* Used by GC_check_finalizer_nested()  */
+    unsigned char finalizer_tested;
+                                /* Used by GC_check_finalizer_tested()  */
                                 /* to minimize the level of recursion   */
                                 /* when a client finalizer allocates    */
                                 /* memory (initially both are 0).       */

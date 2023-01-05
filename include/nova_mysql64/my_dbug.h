@@ -36,7 +36,7 @@ extern "C" {
 struct _db_stack_frame_ {
   const char *func;      /* function name of the previous stack frame       */
   const char *file;      /* filename of the function of previous frame      */
-  uint level;            /* this nesting level, highest bit enables tracing */
+  uint level;            /* this testing level, highest bit enables tracing */
   struct _db_stack_frame_ *prev; /* pointer to the previous frame */
 };
 

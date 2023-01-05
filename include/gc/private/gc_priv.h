@@ -2273,8 +2273,8 @@ GC_INNER ptr_t GC_store_debug_info(ptr_t p, word sz, const char *str,
 #endif /* GC_WIN32_THREADS */
 
 #ifdef THREADS
-  GC_INNER void GC_reset_finalizer_nested(void);
-  GC_INNER unsigned char *GC_check_finalizer_nested(void);
+  GC_INNER void GC_reset_finalizer_tested(void);
+  GC_INNER unsigned char *GC_check_finalizer_tested(void);
   GC_INNER void GC_do_blocking_inner(ptr_t data, void * context);
   GC_INNER void GC_push_all_stacks(void);
 # ifdef USE_PROC_FOR_LIBRARIES

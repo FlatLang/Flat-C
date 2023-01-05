@@ -138,7 +138,7 @@ const pcre2_compile_context PRIV(default_compile_context) = {
   PCRE2_UNSET,                               /* Max pattern length */
   BSR_DEFAULT,                               /* Backslash R default */
   NEWLINE_DEFAULT,                           /* Newline convention */
-  PARENS_NEST_LIMIT };                       /* As it says */
+  PARENS_TEST_LIMIT };                       /* As it says */
 
 /* The create function copies the default into the new memory, but must
 override the default memory handling functions if a gcontext was provided. */
@@ -322,9 +322,9 @@ switch(newline)
 }
 
 PCRE2_EXP_DEFN int PCRE2_CALL_CONVENTION
-pcre2_set_parens_nest_limit(pcre2_compile_context *ccontext, uint32_t limit)
+pcre2_set_parens_test_limit(pcre2_compile_context *ccontext, uint32_t limit)
 {
-ccontext->parens_nest_limit = limit;
+ccontext->parens_test_limit = limit;
 return 0;
 }
 

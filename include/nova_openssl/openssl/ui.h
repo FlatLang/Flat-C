@@ -10,7 +10,7 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
+ *    notice, this list of conditions and the following disclaimer.
  *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in
@@ -101,7 +101,7 @@ void UI_free(UI *ui);
 				is used to verify a previous input.
 			info	use the string for informational output.
 			error	use the string for error output.
-   Honestly, there's currently no difference between info and error for the
+   Hotestly, there's currently no difference between info and error for the
    moment.
 
    UI_{add,dup}_input_boolean have the same semantics for "add" and "dup",

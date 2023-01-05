@@ -597,7 +597,7 @@ static modstruct modlist[] = {
   { "offset",                     MOD_DAT,  MOD_INT, 0,                          DO(offset) },
   { "offset_limit",               MOD_CTM,  MOD_SIZ, 0,                          MO(offset_limit)},
   { "ovector",                    MOD_DAT,  MOD_INT, 0,                          DO(oveccount) },
-  { "parens_nest_limit",          MOD_CTC,  MOD_INT, 0,                          CO(parens_nest_limit) },
+  { "parens_test_limit",          MOD_CTC,  MOD_INT, 0,                          CO(parens_test_limit) },
   { "partial_hard",               MOD_DAT,  MOD_OPT, PCRE2_PARTIAL_HARD,         DO(options) },
   { "partial_soft",               MOD_DAT,  MOD_OPT, PCRE2_PARTIAL_SOFT,         DO(options) },
   { "ph",                         MOD_DAT,  MOD_OPT, PCRE2_PARTIAL_HARD,         DO(options) },
@@ -1181,13 +1181,13 @@ are supported. */
   else \
     pcre2_set_offset_limit_32(G(a,32),b)
 
-#define PCRE2_SET_PARENS_NEST_LIMIT(a,b) \
+#define PCRE2_SET_PARENS_TEST_LIMIT(a,b) \
   if (test_mode == PCRE8_MODE) \
-    pcre2_set_parens_nest_limit_8(G(a,8),b); \
+    pcre2_set_parens_test_limit_8(G(a,8),b); \
   else if (test_mode == PCRE16_MODE) \
-    pcre2_set_parens_nest_limit_16(G(a,16),b); \
+    pcre2_set_parens_test_limit_16(G(a,16),b); \
   else \
-    pcre2_set_parens_nest_limit_32(G(a,32),b)
+    pcre2_set_parens_test_limit_32(G(a,32),b)
 
 #define PCRE2_SET_RECURSION_LIMIT(a,b) \
   if (test_mode == PCRE8_MODE) \
@@ -1605,11 +1605,11 @@ the three different cases. */
   else \
     G(pcre2_set_offset_limit_,BITTWO)(G(a,BITTWO),b)
 
-#define PCRE2_SET_PARENS_NEST_LIMIT(a,b) \
+#define PCRE2_SET_PARENS_TEST_LIMIT(a,b) \
   if (test_mode == G(G(PCRE,BITONE),_MODE)) \
-    G(pcre2_set_parens_nest_limit_,BITONE)(G(a,BITONE),b); \
+    G(pcre2_set_parens_test_limit_,BITONE)(G(a,BITONE),b); \
   else \
-    G(pcre2_set_parens_nest_limit_,BITTWO)(G(a,BITTWO),b)
+    G(pcre2_set_parens_test_limit_,BITTWO)(G(a,BITTWO),b)
 
 #define PCRE2_SET_RECURSION_LIMIT(a,b) \
   if (test_mode == G(G(PCRE,BITONE),_MODE)) \
@@ -1807,7 +1807,7 @@ the three different cases. */
 #define PCRE2_SET_MATCH_LIMIT(a,b) pcre2_set_match_limit_8(G(a,8),b)
 #define PCRE2_SET_MAX_PATTERN_LENGTH(a,b) pcre2_set_max_pattern_length_8(G(a,8),b)
 #define PCRE2_SET_OFFSET_LIMIT(a,b) pcre2_set_offset_limit_8(G(a,8),b)
-#define PCRE2_SET_PARENS_NEST_LIMIT(a,b) pcre2_set_parens_nest_limit_8(G(a,8),b)
+#define PCRE2_SET_PARENS_TEST_LIMIT(a,b) pcre2_set_parens_test_limit_8(G(a,8),b)
 #define PCRE2_SET_RECURSION_LIMIT(a,b) pcre2_set_recursion_limit_8(G(a,8),b)
 #define PCRE2_SUBSTITUTE(a,b,c,d,e,f,g,h,i,j,k,l) \
   a = pcre2_substitute_8(G(b,8),(PCRE2_SPTR8)c,d,e,f,G(g,8),G(h,8), \
@@ -1902,7 +1902,7 @@ the three different cases. */
 #define PCRE2_SET_MATCH_LIMIT(a,b) pcre2_set_match_limit_16(G(a,16),b)
 #define PCRE2_SET_MAX_PATTERN_LENGTH(a,b) pcre2_set_max_pattern_length_16(G(a,16),b)
 #define PCRE2_SET_OFFSET_LIMIT(a,b) pcre2_set_offset_limit_16(G(a,16),b)
-#define PCRE2_SET_PARENS_NEST_LIMIT(a,b) pcre2_set_parens_nest_limit_16(G(a,16),b)
+#define PCRE2_SET_PARENS_TEST_LIMIT(a,b) pcre2_set_parens_test_limit_16(G(a,16),b)
 #define PCRE2_SET_RECURSION_LIMIT(a,b) pcre2_set_recursion_limit_16(G(a,16),b)
 #define PCRE2_SUBSTITUTE(a,b,c,d,e,f,g,h,i,j,k,l) \
   a = pcre2_substitute_16(G(b,16),(PCRE2_SPTR16)c,d,e,f,G(g,16),G(h,16), \
@@ -1997,7 +1997,7 @@ the three different cases. */
 #define PCRE2_SET_MATCH_LIMIT(a,b) pcre2_set_match_limit_32(G(a,32),b)
 #define PCRE2_SET_MAX_PATTERN_LENGTH(a,b) pcre2_set_max_pattern_length_32(G(a,32),b)
 #define PCRE2_SET_OFFSET_LIMIT(a,b) pcre2_set_offset_limit_32(G(a,32),b)
-#define PCRE2_SET_PARENS_NEST_LIMIT(a,b) pcre2_set_parens_nest_limit_32(G(a,32),b)
+#define PCRE2_SET_PARENS_TEST_LIMIT(a,b) pcre2_set_parens_test_limit_32(G(a,32),b)
 #define PCRE2_SET_RECURSION_LIMIT(a,b) pcre2_set_recursion_limit_32(G(a,32),b)
 #define PCRE2_SUBSTITUTE(a,b,c,d,e,f,g,h,i,j,k,l) \
   a = pcre2_substitute_32(G(b,32),(PCRE2_SPTR32)c,d,e,f,G(g,32),G(h,32), \
@@ -2417,9 +2417,9 @@ free(block);
 
 /* This is set up to be called from pcre2_compile() when the stackguard=n
 modifier sets a value greater than zero. The test we do is whether the
-parenthesis nesting depth is greater than the value set by the modifier.
+parenthesis testing depth is greater than the value set by the modifier.
 
-Argument:  the current parenthesis nesting depth
+Argument:  the current parenthesis testing depth
 Returns:   non-zero to kill the compilation
 */
 
@@ -5792,7 +5792,7 @@ while ((c = *p++) != 0)
     case '[':   /* \[ introduces a replicated character sequence */
     if (start_rep != NULL)
       {
-      fprintf(outfile, "** Nested replication is not supported\n");
+      fprintf(outfile, "** Tested replication is not supported\n");
       return PR_OK;
       }
     start_rep = CAST8VAR(q);
@@ -7066,7 +7066,7 @@ printf("  \\C is supported\n");
 (void)PCRE2_CONFIG(PCRE2_CONFIG_LINKSIZE, &optval);
 printf("  Internal link size = %d\n", optval);
 (void)PCRE2_CONFIG(PCRE2_CONFIG_PARENSLIMIT, &optval);
-printf("  Parentheses nest limit = %d\n", optval);
+printf("  Parentheses test limit = %d\n", optval);
 (void)PCRE2_CONFIG(PCRE2_CONFIG_MATCHLIMIT, &optval);
 printf("  Default match limit = %d\n", optval);
 (void)PCRE2_CONFIG(PCRE2_CONFIG_RECURSIONLIMIT, &optval);
@@ -7490,10 +7490,10 @@ if (test_mode == PCRE32_MODE)
   }
 #endif
 
-/* Set a default parentheses nest limit that is large enough to run the
+/* Set a default parentheses test limit that is large enough to run the
 standard tests (this also exercises the function). */
 
-PCRE2_SET_PARENS_NEST_LIMIT(default_pat_context, 220);
+PCRE2_SET_PARENS_TEST_LIMIT(default_pat_context, 220);
 
 /* Handle command line modifier settings, sending any error messages to
 stderr. We need to know the mode before modifying the context, and it is tidier

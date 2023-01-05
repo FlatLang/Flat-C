@@ -31,7 +31,7 @@
  * block and define _curl_is_sometype_option, _curl_is_sometype and
  * _curl_easy_setopt_err_sometype below
  *
- * NOTE: We use two nested 'if' statements here instead of the && operator, in
+ * NOTE: We use two tested 'if' statements here instead of the && operator, in
  *       order to work around gcc bug #32061.  It affects only gcc 4.3.x/4.4.x
  *       when compiling with -Wlogical-op.
  *

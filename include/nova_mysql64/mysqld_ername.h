@@ -473,7 +473,7 @@
 { "ER_WRONG_STRING_LENGTH", 1470, "String \'%-.70s\' is too long for %s (should be no longer than %d)" },
 { "ER_NON_INSERTABLE_TABLE", 1471, "The target table %-.100s of the %s is not insertable-into" },
 { "ER_ADMIN_WRONG_MRG_TABLE", 1472, "Table \'%-.64s\' is differently defined or of non-MyISAM type or doesn\'t exist" },
-{ "ER_TOO_HIGH_LEVEL_OF_NESTING_FOR_SELECT", 1473, "Too high level of nesting for select" },
+{ "ER_TOO_HIGH_LEVEL_OF_TESTING_FOR_SELECT", 1473, "Too high level of testing for select" },
 { "ER_NAME_BECOMES_EMPTY", 1474, "Name \'%-.64s\' has become \'\'" },
 { "ER_AMBIGUOUS_FIELD_TERM", 1475, "First character of the FIELDS TERMINATED string is ambiguous; please use non-optional and non-empty FIELDS ENCLOSED BY" },
 { "ER_FOREIGN_SERVER_EXISTS", 1476, "The foreign server, %s, you are trying to create already exists." },

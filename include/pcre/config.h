@@ -203,10 +203,10 @@ sure both macros are undefined; an emulation function will then be used. */
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "10.22"
 
-/* The value of PARENS_NEST_LIMIT specifies the maximum depth of nested
+/* The value of PARENS_TEST_LIMIT specifies the maximum depth of tested
    parentheses (of any kind) in a pattern. This limits the amount of system
    stack that is used while compiling a pattern. */
-#define PARENS_NEST_LIMIT 250
+#define PARENS_TEST_LIMIT 250
 
 /* The value of PCRE2GREP_BUFSIZE determines the size of buffer used by
    pcre2grep to hold parts of the file it is searching. This is also the
